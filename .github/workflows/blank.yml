@@ -1,0 +1,65 @@
+stages:
+  - build
+  - test
+  - deploy
+
+build_frontend:
+  stage: build
+  script:
+    - echo "Building frontend"
+
+build_backend:
+  stage: build
+  script:
+    - echo "Building backend"
+
+test_frontend:
+  stage: test
+  script:
+    - echo "Test the frontend"
+
+test_backend:
+  stage: test
+  script:
+    - echo "Test the backend"
+
+test_e2e:
+  stage: test
+  script:
+    - echo "Test the complete app"
+
+deploy:
+  stage: deploy
+  script:
+    - echo "Deploy the validated app"
+O exemplo acima aparece assim na interface:
+
+Visualização da esteira de CI no GitLab
+
+Um problema dessa abordagem é que todos os jobs de cada estágio devem terminar antes de começar os jobs do próximo. Isso pode ter um grande impacto se o tempo dos jobs de um mesmo estágio forem muito diferentes, um job mais lento de um estágio atrasa toda a esteira.
+
+Para resolver esse problema o GitLab CI oferece também a construção de esteiras com DAGs, basta adicionar a chave needs em alguns locais do exemplo acima:
+
+ test_frontend:
+   stage: test
++  needs: [build_frontend]
+   script:
+     - echo "Test the frontend"
+
+ test_backend:
+   stage: test
++  needs: [build_backend]
+   script:
+     - echo "Test the backend"
+
+ test_e2e:
+   stage: test
++  needs: [build_frontend, build_backend]
+   script:
+     - echo "Test the complete app"
+
+ deploy:
+   stage: deploy
++  needs: [test_frontend, test_backend, test_e2e]
+   script:
+     - echo "Deploy the validated app"
