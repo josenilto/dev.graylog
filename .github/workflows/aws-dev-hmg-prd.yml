@@ -1,0 +1,73 @@
+name: Deploy to AWS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy_dev:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Deploy to dev
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      - run: |
+          aws cloudformation package \
+          --template-file template.yaml \
+          --s3-bucket my-app-dev-bucket \
+          --output-template-file packaged-template.yaml
+      - run: |
+          aws cloudformation deploy \
+          --template-file packaged-template.yaml \
+          --stack-name my-app-dev \
+          --capabilities CAPABILITY_IAM
+
+  deploy_hmg:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Deploy to hmg
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      - run: |
+          aws cloudformation package \
+          --template-file template.yaml \
+          --s3-bucket my-app-hmg-bucket \
+          --output-template-file packaged-template.yaml
+      - run: |
+          aws cloudformation deploy \
+          --template-file packaged-template.yaml \
+          --stack-name my-app-hmg \
+          --capabilities CAPABILITY_IAM
+
+  deploy_prd:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Deploy to prd
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      - run: |
+          aws cloudformation package \
+          --template-file template.yaml \
+          --s3-bucket my-app-prd-bucket \
+          --output-template-file packaged-template.yaml
+      - run: |
+          aws cloudformation deploy \
+          --template-file packaged-template.yaml \
+          --stack-name my-app-prd \
+          --capabilities CAPABILITY_IAM
