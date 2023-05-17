@@ -2,7 +2,7 @@
 version: "3"
 services:
   mongodb:
-    image: mongo:4.3
+    image: mongo:4.2
     container_name: monitoring-mongodb
     volumes:
       - mongo_data:/data/db
@@ -45,8 +45,7 @@ services:
     image: nginx:1.23.4
     container_name: monitoring-nginx
     volumes:
-      - graylog_nginx:/etc/nginx/conf.d/
-      - graylog_nginx_certs:/etc/nginx/certs/
+      - graylog_nginx:/etc/nginx
       - graylog_data:/var/www/html/graylog
     links:
       - mongodb:mongo
